@@ -190,7 +190,50 @@ def populate_nums(g):
             if count > 0 and not g.grid[i][j].is_bomb():
                 g.grid[i][j].set_num(count)
     return
-                     
+
+
+def display_ending(g, alive, start):
+    end = time.time()
+    final_print(g)
+    if not alive:
+        print('Game over.')
+    else:
+        print('You win.')
+    mins = int(end - start) // 60
+    secs = int(end - start) % 60
+    print('Time elapsed:', mins, 'minute', end='')
+    if mins != 1:
+        print('s', end=' ')
+    print(secs, 'second', end='')
+    if secs != 1:
+        print('s')
+    else:
+        print()
+
+    # calculate bombs flagged correctly, number of incorrect flags, and bombs left unflagged
+
+    total_flags = 0
+    correct_flags = 0
+    incorrect_flags = 0
+    unflagged_mines = 0
+
+    for i in g.grid:
+        for j in i:
+            if j.flag:
+                total_flags += 1
+                if j.is_bomb():
+                    correct_flags += 1
+                else:
+                    incorrect_flags += 1
+            elif j.is_bomb():
+                unflagged_mines += 1
+
+    print('Total mines:', total)
+    print('Flags used:', total_flags)
+    print('Correct flags:', correct_flags)
+    print('Incorrect flags:', incorrect_flags)
+    print('Unflagged mines:', unflagged_mines)
+
 
 num_rows = int(input('Enter the number of rows (height) for the map: ').strip())
 while num_rows <= 0:
@@ -243,87 +286,66 @@ alive = True
 total = populate_mines(g, difficulty, choice_x, choice_y)
 populate_nums(g)
 g.grid[choice_x][choice_y].mine(g)
+if check_grid(g):
+    display_ending(g, alive, time.time())
+    exit(0)
 
 print_grid(g)
 print(total - num_flags, 'bombs remaining.')
 start = time.time()
 
 while True:
-    choice_x = input('Enter the row of a tile to mine: ')
+    flag = input('Enter \'m\' to mine and \'f\' to place a flag: ').lower()
+    while flag != 'm' and flag != 'f':
+        flag = input('Invalid input. Enter \'m\' to mine and \'f\' to place a flag: ').lower()
+
+    choice_x = -1
+    choice_y = -1
+    print('Enter the row of a tile to ', end='')
+    if flag:
+        choice_x = input('flag: ')
+    else:
+        choice_x = input('mine: ')
+
     while int(choice_x) < 0 or int(choice_x) >= g.rows:
-        choice_x = input('Out of bounds. Enter the row of a tile to mine: ')
-    choice_y = input('Enter the column of a tile to mine (or \'c\' to cancel): ')
+        print('Out of bounds. Enter the row of a tile to ', end='')
+        if flag:
+            choice_x = input('flag: ')
+        else:
+            choice_x = input('mine: ')
+
+    print('Enter the column of a tile to ', end='')
+    if flag:
+        choice_y = input('flag (or \'c\' to cancel): ')
+    else:
+        choice_y = input('mine (or \'c\' to cancel): ')
+
     if choice_y == 'c':
         continue
     while int(choice_y) < 0 or int(choice_y) >= g.cols:
-        choice_y = input('Out of bounds. Enter the column of a tile to mine (or \'c\' to cancel): ')
+        print('Out of bounds. Enter the column of a tile to ', end='')
+        if flag:
+            choice_y = input('flag (or \'c\' to cancel): ')
+        else:
+            choice_y = input('mine (or \'c\' to cancel): ')
         if choice_y == 'c':
             continue
-    flag = input('Toggle flag? (\'y\' or \'n\'): ').lower()
-    while flag != 'y' and flag != 'n':
-        flag = input('Invalid input. Toggle flag? (\'y\' or \'n\'): ').lower()
     
     choice_x = int(choice_x)
     choice_y = int(choice_y)
     alive = True
     
-    if flag == 'y':
+    if flag == 'f':
         num_flags = g.grid[choice_x][choice_y].toggle_flag(num_flags)    
     else:
         alive = g.grid[choice_x][choice_y].mine(g)
     
     if check_grid(g) or not alive:
-        end = time.time()
-        final_print(g)
-        if not alive:
-            print('Game over.')
-        else:
-            print('You win.')
-        mins = int(end - start) // 60
-        secs = int(end - start) % 60
-        print('Time elapsed:', mins, 'minute', end='')
-        if mins != 1:
-            print('s', end=' ')
-        print(secs, 'second', end='')
-        if secs != 1:
-            print('s')
-        else:
-            print()
-
-        # calculate bombs flagged correctly, number of incorrect flags, and bombs left unflagged
-        
-        total_flags = 0
-        correct_flags = 0
-        incorrect_flags = 0
-        unflagged_mines = 0
-        
-        for i in g.grid:
-            for j in i:
-                if j.flag:
-                    total_flags += 1
-                    if j.is_bomb():
-                        correct_flags += 1
-                    else:
-                        incorrect_flags += 1
-                elif j.is_bomb():
-                    unflagged_mines += 1
-        
-        print('Total mines:', total)
-        print('Flags used:', total_flags)
-        print('Correct flags:', correct_flags)
-        print('Incorrect flags:', incorrect_flags)
-        print('Unflagged mines:', unflagged_mines)
+        display_ending(g, alive, start)
         break
     
     else:
         print_grid(g)
         print(total - num_flags, 'bombs remaining.')
-        
-        
-        
-        
-        
-        
-        
-        
-        
+
+exit(0)
