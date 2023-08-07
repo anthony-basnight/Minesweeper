@@ -9,7 +9,8 @@ Created on Tue Oct 25 12:00:49 2022
 import random
 import time
 
-class Point():
+
+class Point:
     def __init__(self, row, col, character, bomb, flag, mined, neighbors):
         self.row = row
         self.col = col
@@ -63,7 +64,8 @@ class Point():
     def __repr__(self):
         return self.character
 
-class Grid():
+
+class Grid:
     def __init__(self, rows, cols):
         self.rows = rows
         self.cols = cols
@@ -71,6 +73,7 @@ class Grid():
     
     def __repr__(self):
         return print_grid(self)
+
 
 def print_grid(g):
     print()
@@ -98,6 +101,7 @@ def print_grid(g):
     print('--+')
     print()
     return
+
 
 def final_print(g):
     print()
@@ -129,12 +133,14 @@ def final_print(g):
     print()
     return
 
+
 def check_grid(g):
     for i in range(len(g.grid)):
         for j in range(len(g.grid[i])):
             if not g.grid[i][j].is_bomb() and not g.grid[i][j].mined:
                 return False
     return True
+
 
 def create_grid(rows, cols):
     g = []
@@ -144,6 +150,7 @@ def create_grid(rows, cols):
             temp.append(Point(i, j, '.', False, False, False, get_neighbors(i, j, rows, cols)))
         g.append(temp)
     return g
+
 
 def populate_mines(g, difficulty, choice_x = -1, choice_y = -1):
     total = 0
@@ -157,6 +164,7 @@ def populate_mines(g, difficulty, choice_x = -1, choice_y = -1):
                 total += 1
     return total
 
+
 def get_neighbors(x, y, max_x, max_y):
     n = []
     if x-1 >= 0 and y-1 >= 0: n.append((x-1, y-1))
@@ -168,6 +176,7 @@ def get_neighbors(x, y, max_x, max_y):
     if y+1 < max_y: n.append((x, y+1))
     if x+1 < max_x and y+1 < max_y: n.append((x+1, y+1))
     return n
+
 
 def populate_nums(g):
     for i in range(len(g.grid)):
@@ -184,7 +193,14 @@ def populate_nums(g):
                      
 
 num_rows = int(input('Enter the number of rows (height) for the map: ').strip())
+while num_rows <= 0:
+    print('There must be at least one row.')
+    num_rows = int(input('Enter the number of rows (height) for the map: ').strip())
+
 num_cols = int(input('Enter the number of columns (width) for the map: ').strip())
+while num_cols <= 0:
+    print('There must be at least one column.')
+    num_cols = int(input('Enter the number of columns (width) for the map: ').strip())
 
 while num_rows * num_cols > 2000 or num_rows > 100 or num_cols > 100:
     print('Map is too big. Please limit to 2000 tiles and a maximum dimension of 100.')
@@ -207,7 +223,7 @@ g = Grid(num_rows, num_cols)
 num_flags = 0
 print_grid(g)
 
-while(True):
+while True:
     choice_x = input('Enter the row of a tile to mine: ')
     while int(choice_x) < 0 or int(choice_x) >= g.rows:
         choice_x = input('Out of bounds. Enter the row of a tile to mine: ')
