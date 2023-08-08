@@ -51,7 +51,6 @@ class Point:
             temp = self.character
             self.character = self.original_char
             self.original_char = temp
-            #self.mined = False
             num_flags -= 1
         else:
             self.flag = True
@@ -135,6 +134,23 @@ def final_print(g):
 
 
 def check_grid(g):
+    # The game can end when either all mines are flagged correctly or there are no more tiles to mine other than bombs
+    correct_flags = 0
+    incorrect_flags = 0
+    num_mines = 0
+
+    for i in g.grid:
+        for j in i:
+            if j.is_bomb():
+                num_mines += 1
+                if j.flag:
+                    correct_flags += 1
+            elif j.flag:
+                incorrect_flags += 1
+
+    if num_mines == correct_flags and incorrect_flags == 0:
+        return True
+
     for i in range(len(g.grid)):
         for j in range(len(g.grid[i])):
             if not g.grid[i][j].is_bomb() and not g.grid[i][j].mined:
